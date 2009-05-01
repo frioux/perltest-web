@@ -1,0 +1,9 @@
+.true-value {
+   background-image: url(/static/img/tick.png) !important;
+   background-repeat: no-repeat;
+}
+
+.false-value {
+   background-image: url(/static/img/exclamation.png) !important;
+   background-repeat: no-repeat;
+}
