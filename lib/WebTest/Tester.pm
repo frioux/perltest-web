@@ -1,6 +1,5 @@
 package WebTest::Tester;
 use Moose;
-use feature ':5.10';
 
 use File::Find::Rule;
 use TAP::Parser;
