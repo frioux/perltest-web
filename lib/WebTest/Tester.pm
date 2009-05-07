@@ -27,7 +27,6 @@ sub tests {
    foreach my $file (@files) {
       push @total_results, "<span class='file'>$file</span>";
       my $tap_output = qx{perl $file 2>&1};
-      warn $tap_output;
       my $parser = TAP::Parser->new( { tap => $tap_output } );
       RESULT:
       while ( my $result = $parser->next ) {
