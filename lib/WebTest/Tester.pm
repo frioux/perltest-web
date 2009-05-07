@@ -8,6 +8,7 @@ use TAP::Parser::Aggregator;
 use File::Spec;
 use File::stat;
 use Carp;
+use Method::Signatures::Simple;
 
 has directory => (
    is       => 'rw',
@@ -17,8 +18,47 @@ has directory => (
    writer   => 'set_directory',
 );
 
-sub tests {
-   my $self  = shift;
+my $formatters = {
+   plan => sub {
+      my $result = shift;
+      return q{<span class='plan'>}.$result->plan.q{</span>};
+   },
+   test => sub {
+      my $result = shift;
+      my @ok = ( $result->is_ok )
+         ? ( q{<span class='passed-test'>ok},q{</span>} )
+         : ( q{<span class='failed-test'>not ok},q{</span>} );
+      my $todo = ( $result->has_todo )
+         ? ' # TODO '.$result->explanation
+         : '';
+      return "$ok[0] ".$result->number.q{ }.$result->description."$todo</span>";
+   },
+   comment => sub {
+      my $result = shift;
+      return q{<span class='comment'>}.$result->as_string.'</span>';
+   },
+   default => sub {
+      my $result = shift;
+      return q{<span class ='unknown'># }.$result->as_string.'</span>';
+   }
+};
+
+method test($file) {
+   my @total_results;
+   my $tap_output = qx{perl $file 2>&1};
+   my $parser = TAP::Parser->new( { tap => $tap_output } );
+   RESULT:
+   while ( my $result = $parser->next ) {
+      if (my $fn = $formatters->{ $result->type }) {
+         push @total_results, $fn->( $result );
+      } else {
+         push @total_results, $formatters->{ default }->( $result );
+      }
+   }
+   return \@total_results;
+}
+
+method tests {
    my @files = File::Find::Rule->file()->name('*.t')
       ->in( File::Spec->catdir( $self->get_directory, 't' ) );
 
@@ -26,31 +66,7 @@ sub tests {
 
    foreach my $file (@files) {
       push @total_results, "<span class='file'>$file</span>";
-      my $tap_output = qx{perl $file 2>&1};
-      my $parser = TAP::Parser->new( { tap => $tap_output } );
-      RESULT:
-      while ( my $result = $parser->next ) {
-         given ( $result->type ) {
-            when ( 'plan' ) {
-               push @total_results, q{<span class='plan'>}.$result->plan.q{</span>};
-            }
-            when ( 'test' ) {
-               my @ok = ( $result->is_ok )
-                  ? ( q{<span class='passed-test'>ok},q{</span>} )
-                  : ( q{<span class='failed-test'>not ok},q{</span>} );
-               my $todo = ( $result->has_todo )
-                  ? ' # TODO '.$result->explanation
-                  : '';
-               push @total_results, "$ok[0] ".$result->number.q{ }.$result->description."$todo</span>";
-            }
-            when ( 'comment' ) {
-               push @total_results, q{<span class='comment'>}.$result->as_string.'</span>';
-            }
-            default {
-               push @total_results, q{<span class ='unknown'># }.$result->as_string.'</span>';
-            }
-         }
-      }
+      push @total_results, @{ $self->test( $file ) };
    }
    return join "\n", @total_results;
 }
