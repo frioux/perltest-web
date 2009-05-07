@@ -1,0 +1,33 @@
+body {
+   background-color: black;
+   color: gray;
+}
+
+span.passed-test {
+   color: lightgreen;
+}
+
+span.failed-test {
+   color: pink;
+}
+
+span.test {
+   color: white;
+}
+
+span.comment {
+   color: red;
+}
+
+span.file {
+   color: yellow;
+}
+
+span.plan {
+   color: orange;
+}
+
+.false-value {
+   background-image: url(/static/img/exclamation.png) !important;
+   background-repeat: no-repeat;
+}
