@@ -1,3 +1,0 @@
-severity = 1
-theme = core
-exclude = Miscellanea::RequireRcsKeywords Modules::RequireVersionVar CodeLayout::RequireTidyCode
