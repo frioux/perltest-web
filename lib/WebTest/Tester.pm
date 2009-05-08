@@ -58,7 +58,7 @@ method test($file) {
 }
 
 method tests {
-   my @files = File::Find::Rule->file()->name('*.t')
+   my @files = File::Find::Rule->file()->name('*.t')->maxdepth( 1 )
       ->in( File::Spec->catdir( $self->get_directory, 't' ) );
 
    my @total_results;
