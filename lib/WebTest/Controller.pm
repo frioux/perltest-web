@@ -9,7 +9,7 @@ sub tester {
    my $self = shift;
    if ( !$self->param('tester') ) {
       $self->param( 'tester',
-         WebTest::Tester->new( { directory => $self->param('dir') } ) );
+         WebTest::Tester->new( { directory => $self->param('dir') || q{.} } ) );
    }
    return $self->param('tester');
 }
