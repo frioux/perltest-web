@@ -2,8 +2,13 @@ package WebTest::Controller;
 use strict;
 use warnings;
 use base 'CGI::Application';
-use CGI::Application::Plugin::AutoRunmode;
 use WebTest::Tester;
+
+sub cgiapp_init {
+   my $self = shift;
+   $self->run_modes([qw/main/]);
+   $self->start_mode('main');
+}
 
 sub tester {
    my $self = shift;
@@ -14,13 +19,12 @@ sub tester {
    return $self->param('tester');
 }
 
-sub main : StartRunmode {
+sub main {
    my $self   = shift;
    my $output = <<'HTML';
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
- <link href="/css/css.css" rel="stylesheet" type="text/css" />
  <title>Tested!!!!</title>
 </head>
 <body><pre>

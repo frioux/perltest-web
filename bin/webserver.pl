@@ -5,13 +5,10 @@ use CGI::Application::Server;
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 use WebTest::Controller;
-use Readonly;
-Readonly my $port => shift || 5052;
-Readonly my $dir  => shift || q{.};
 
-my $server = CGI::Application::Server->new($port);
+my $server = CGI::Application::Server->new(5052);
 my $app    = WebTest::Controller->new( PARAMS => {
-   dir => $dir
+   dir => q{.}
 });
 
 $server->entry_points({ '/tests' => $app });
