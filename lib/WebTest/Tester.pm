@@ -46,7 +46,6 @@ method test($file) {
    my @total_results;
    my $tap_output = qx{perl $file 2>&1};
    my $parser = TAP::Parser->new( { tap => $tap_output } );
-   RESULT:
    while ( my $result = $parser->next ) {
       if (my $fn = $formatters->{ $result->type }) {
          push @total_results, $fn->( $result );
@@ -58,16 +57,10 @@ method test($file) {
 }
 
 method tests {
-   my @files = File::Find::Rule->file()->name('*.t')->maxdepth( 1 )
-      ->in( File::Spec->catdir( $self->get_directory, 't' ) );
-
-   my @total_results;
-
-   foreach my $file (@files) {
-      push @total_results, "<span class='file'>$file</span>";
-      push @total_results, @{ $self->test( $file ) };
-   }
-   return join "\n", @total_results;
+   return join "\n", map {
+      ( "<span class='file'>$_</span>", @{ $self->test( $_ ) } );
+   } File::Find::Rule->file()->name('*.t')->maxdepth( 1 )
+      ->in( File::Spec->catdir( $self->get_directory, 't' ) )
 }
 
 no Moose;
